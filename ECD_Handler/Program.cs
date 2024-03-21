@@ -52,12 +52,16 @@ namespace ECD_Handler
             // Read configuration from app.config file
             string? workDir = ConfigurationManager.AppSettings["TargetDir"];
             string? fileExtension = ConfigurationManager.AppSettings["FileExtension"];
+            string? outputDir = ConfigurationManager.AppSettings["OutputDir"];
 
             string work_dir= Path.Join(get_home_dir(), workDir); // * 1. Target dir where statements can be found
             string[] files= Directory.GetFiles(work_dir, fileExtension); // * Always xml
             string[] welcome_msg= {"# Programa ECD Handler"
                                 ," # The files are going to be selected from "+work_dir};
-            
+
+            List<string> outputLines = new List<string>();
+            outputLines.AddRange(welcome_msg);
+
             print_msgs(txt_msgs: welcome_msg, sep: new string('\n', 2));
 
             
@@ -73,7 +77,14 @@ namespace ECD_Handler
                 // 4. Print the total of each invoice for each ECD provided
                 file_msg_aux[0] = "ECD: "+file.Split('\\')[file.Split('\\').Length - 1];
                 print_msgs(txt_msgs: file_msg_aux, end: "\n\n");
+                outputLines.AddRange(file_msg_aux);
             }
+
+            // Write output to a file
+            string outputPath = Path.Combine(get_home_dir(), outputDir);
+            File.WriteAllLines(outputPath, outputLines);
+            Console.WriteLine($"Output written to: {outputPath}");
+            Console.ReadLine();
         }
     }
 }

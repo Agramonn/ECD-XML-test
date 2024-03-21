@@ -7,6 +7,7 @@
 
 using ECD_Handler.Handler;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Xml.Linq;
 
 namespace ECD_Handler
@@ -48,8 +49,12 @@ namespace ECD_Handler
         
         static void Main(string[] args)
         {
-            string work_dir= Path.Join(get_home_dir(), "desktop\\bravos\\ECD-XML-test\\ECD_Handler\\XML_files\\"); // * 1. Target dir where statements can be found
-            string[] files= Directory.GetFiles(work_dir, "*.xml"); // * Always xml
+            // Read configuration from app.config file
+            string? workDir = ConfigurationManager.AppSettings["TargetDir"];
+            string? fileExtension = ConfigurationManager.AppSettings["FileExtension"];
+
+            string work_dir= Path.Join(get_home_dir(), workDir); // * 1. Target dir where statements can be found
+            string[] files= Directory.GetFiles(work_dir, fileExtension); // * Always xml
             string[] welcome_msg= {"# Programa ECD Handler"
                                 ," # The files are going to be selected from "+work_dir};
             

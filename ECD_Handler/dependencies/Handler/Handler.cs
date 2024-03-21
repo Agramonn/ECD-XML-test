@@ -10,8 +10,15 @@ namespace ECD_Handler.Handler
             // Loading the XML file using Xml.Linq
             XDocument xmlDocument = XDocument.Load(file);
 
-            // Go into every node that cointains the value that we want and return the IEnumerable of Elements
-            IEnumerable<XElement> xElements = xmlDocument.Descendants("monto_total");
+            // Select all monto_total elements inside factura nodes where num_liq="0"
+            IEnumerable<XElement> xElements = xmlDocument.Descendants("liquidacion")
+                                                             .Where(l => (string)l.Attribute("num_liq") == "0")
+                                                             .Elements("facturas")
+                                                             .Elements("factura")
+                                                             .Where(f => (string)f.Parent.Parent.Attribute("num_liq") == "0")
+                                                             .Elements("conceptos")
+                                                             .Elements("concepto")
+                                                             .Elements("monto_total");
             return xElements;
         } 
 

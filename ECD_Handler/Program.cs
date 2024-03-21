@@ -5,6 +5,10 @@
 // using ECD_Handler.Handler;
 
 
+using ECD_Handler.Handler;
+using System.Collections.Generic;
+using System.Xml.Linq;
+
 namespace ECD_Handler
 {
     class Program
@@ -33,36 +37,38 @@ namespace ECD_Handler
         }
         
         //         
-        static void process_files_dir(string[] files) // Currently not returning a value
+        static decimal process_files_dir(string file) 
         {
-            string[] file_msg_aux= {""
-                                ,""
-                                ,new String('-', 30)};
-            foreach(string file in files)
-            {
-                file_msg_aux[0]= file.Split('\\')[file.Split('\\').Length - 1];
-                // only displays the filename
-                print_msgs(txt_msgs: file_msg_aux, end: "\n\n");
-                
-                // 2. Processing: either by adding local functions or by developing the Handler class
-            }
-            
-            
+            // 2. Processing: either by adding local functions or by developing the Handler class
+            //Parse the XML
+            IEnumerable<XElement> xElements = ECD_File.parseXML(file);
+            //Calculete the total balance of the ECD
+            return ECD_File.calculateBalance(xElements);             
         }
         
         static void Main(string[] args)
         {
-            string work_dir= Path.Join(get_home_dir(), "Downloads"); // * 1. Target dir where statements can be found
+            string work_dir= Path.Join(get_home_dir(), "desktop\\bravos\\ECD-XML-test\\ECD_Handler\\XML_files\\"); // * 1. Target dir where statements can be found
             string[] files= Directory.GetFiles(work_dir, "*.xml"); // * Always xml
-            string[] welcome_msg= {"   # Programa ECD Handler"
+            string[] welcome_msg= {"# Programa ECD Handler"
                                 ," # The files are going to be selected from "+work_dir};
             
             print_msgs(txt_msgs: welcome_msg, sep: new string('\n', 2));
+
             
-            // 3. Results returning??
-            process_files_dir(files);
-            
-            // 4. Print the total of each invoice for each ECD provided
+            foreach (string file in files) // Iterate trough the array of XML files.
+            {
+                // 3. Results returning is the amount of montoTotal
+                decimal totalBalance = process_files_dir(file);
+
+                string[] file_msg_aux = {""
+                                ,$"\n Total balance: {totalBalance.ToString("C")}"
+                                ,new String('-', 30)};
+
+                // 4. Print the total of each invoice for each ECD provided
+                file_msg_aux[0] = "ECD: "+file.Split('\\')[file.Split('\\').Length - 1];
+                print_msgs(txt_msgs: file_msg_aux, end: "\n\n");
+            }
         }
     }
 }
